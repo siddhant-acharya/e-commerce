@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import fetchProducts from '../redux/productActions'
 import Filters from '../components/Filters'
@@ -13,22 +13,35 @@ function ProductList() {
     fetchProducts(dispatch);
   }, [dispatch]);
 
-  let filteredProducts = [...products];
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
 
-  if (search) {
-    filteredProducts = filteredProducts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
-  }
-  if (category !== 'all') {
-    filteredProducts = filteredProducts.filter(p => p.category === category);
-  }
-  if (sort === 'low') {
-    filteredProducts.sort((a, b) => a.price - b.price);
-  }
-  if (sort === 'high') {
-    filteredProducts.sort((a, b) => b.price - a.price);
-  }
+    if (search) {
+      result = result.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+    }
+    if (category !== 'all') {
+      result = result.filter(p => p.category === category);
+    }
+    if (sort === 'low') {
+      result.sort((a, b) => a.price - b.price);
+    }
+    if (sort === 'high') {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [products, search, category, sort]);
 
   if (loading) return <h2>Loading products...</h2>;
+
+  if (filteredProducts.length === 0) {
+    return (
+      <>
+        <Filters />
+        <p style={{ marginTop: "20px" }}>No products found.</p>
+      </>
+    )
+  }
 
   return (
     <>

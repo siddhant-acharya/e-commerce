@@ -5,6 +5,15 @@ function Cart() {
   const dispatch = useDispatch();
   const items = useSelector(state => state.cart.items);
 
+  if (items.length === 0) {
+    return (
+      <div>
+        <h3>Cart</h3>
+        <p>Your cart is empty.</p>
+      </div>
+    )
+  }
+
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
