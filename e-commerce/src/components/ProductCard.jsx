@@ -15,7 +15,7 @@ function ProductCard({ product }) {
         />
 
         <h3>{product.title}</h3>
-        <p><b>₹{product.price}</b></p>
+        <p><b>${product.price}</b></p>
         <p>Category: {product.category}</p>
 
         <p style={{ color: inStock ? "green" : "red" }}>

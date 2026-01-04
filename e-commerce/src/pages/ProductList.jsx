@@ -1,31 +1,51 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import fetchProducts from '../redux/productActions'
+import Filters from '../components/Filters'
 import ProductCard from '../components/ProductCard'
 
 function ProductList() {
-    const dispatch = useDispatch();
-    const { products, loading } = useSelector(state => state.products);
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        fetchProducts(dispatch);
-    }, [dispatch]);
+  const { products, search, category, sort, loading } = useSelector(state => state.products);
 
-    if (loading) return <h2>Loading products</h2>
+  useEffect(() => {
+    fetchProducts(dispatch);
+  }, [dispatch]);
+
+  let filteredProducts = [...products];
+
+  if (search) {
+    filteredProducts = filteredProducts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+  }
+  if (category !== 'all') {
+    filteredProducts = filteredProducts.filter(p => p.category === category);
+  }
+  if (sort === 'low') {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  }
+  if (sort === 'high') {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
+
+  if (loading) return <h2>Loading products...</h2>;
 
   return (
     <>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-        gap: "20px" }}
+      <Filters />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px"
+        }}
       >
-        {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        {filteredProducts.map(product => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </>
   )
 }
 
-export default ProductList
+export default ProductList;
